@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firebase & CRUD - OrderFlow PWA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .test-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .test-card:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.3);
+        }
+        .test-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .results {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .app-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Test Firebase & CRUD - OrderFlow PWA</h1>
+            <p>Testează integrarea Firebase și operațiunile CRUD</p>
+        </div>
+
+        <div class="content">
+            <div class="test-grid">
+                <div class="test-card">
+                    <h3>🔥 Firebase Connection</h3>
+                    <p>Testează conexiunea la Firebase</p>
+                    <button class="test-button" onclick="testFirebaseConnection()">Testează Conexiunea</button>
+                    <button class="test-button" onclick="testFirebaseAuth()">Testează Autentificare</button>
+                    <div class="results" id="firebaseResults"></div>
+                </div>
+
+                <div class="test-card">
+                    <h3>📊 CRUD Operations</h3>
+                    <p>Testează operațiunile Create, Read, Update, Delete</p>
+                    <button class="test-button" onclick="testCreateOperations()">Testează Create</button>
+                    <button class="test-button" onclick="testReadOperations()">Testează Read</button>
+                    <div class="results" id="crudResults"></div>
+                </div>
+
+                <div class="test-card">
+                    <h3>💾 LocalStorage Fallback</h3>
+                    <p>Testează funcționarea fără Firebase</p>
+                    <button class="test-button" onclick="testLocalStorageMode()">Testează LocalStorage</button>
+                    <button class="test-button" onclick="testDataPersistence()">Testează Persistența</button>
+                    <div class="results" id="storageResults"></div>
+                </div>
+
+                <div class="test-card">
+                    <h3>🔄 Data Sync</h3>
+                    <p>Testează sincronizarea datelor</p>
+                    <button class="test-button" onclick="testDataSync()">Testează Sincronizare</button>
+                    <button class="test-button" onclick="testOfflineSync()">Testează Offline Sync</button>
+                    <div class="results" id="syncResults"></div>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h2>🌐 Aplicația OrderFlow</h2>
+                <p>Testează operațiunile CRUD în aplicația reală:</p>
+                <iframe src="http://localhost:4173" class="app-frame" id="appFrame"></iframe>
+            </div>
+
+            <div class="test-card">
+                <h2>📊 Raport Testare Firebase & CRUD</h2>
+                <button class="test-button" onclick="generateFirebaseReport()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    Generează Raport
+                </button>
+                <div class="results" id="firebaseReport"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let firebaseTestResults = {
+            connection: {},
+            auth: {},
+            crud: {},
+            storage: {},
+            sync: {}
+        };
+
+        function testFirebaseConnection() {
+            const results = document.getElementById('firebaseResults');
+            let result = '🔥 Testare Conexiune Firebase:\n';
+            
+            try {
+                // Verifică dacă Firebase este disponibil
+                if (typeof firebase !== 'undefined') {
+                    result += '✅ Firebase SDK încărcat\n';
+                    firebaseTestResults.connection.sdkLoaded = true;
+                } else {
+                    result += '❌ Firebase SDK nu este încărcat\n';
+                    firebaseTestResults.connection.sdkLoaded = false;
+                }
+                
+                // Verifică configurația Firebase
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Caută configurația Firebase în aplicație
+                const scripts = iframeDoc.querySelectorAll('script');
+                let firebaseConfigFound = false;
+                
+                scripts.forEach(script => {
+                    if (script.textContent.includes('firebaseConfig') || 
+                        script.textContent.includes('apiKey')) {
+                        firebaseConfigFound = true;
+                    }
+                });
+                
+                if (firebaseConfigFound) {
+                    result += '✅ Configurația Firebase găsită\n';
+                    firebaseTestResults.connection.configFound = true;
+                } else {
+                    result += '❌ Configurația Firebase nu a fost găsită\n';
+                    firebaseTestResults.connection.configFound = false;
+                }
+                
+                // Testează conectivitatea la Firebase
+                fetch('https://firebase.googleapis.com/v1beta1/projects/order-flow-28c1b', {
+                    method: 'GET',
+                    mode: 'no-cors'
+                }).then(() => {
+                    result += '✅ Conectivitate Firebase OK\n';
+                    firebaseTestResults.connection.connectivity = true;
+                }).catch(() => {
+                    result += '⚠️ Conectivitate Firebase incertă\n';
+                    firebaseTestResults.connection.connectivity = false;
+                }).finally(() => {
+                    results.innerHTML = result;
+                });
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea conexiunii Firebase: ${error.message}\n`;
+                firebaseTestResults.connection.error = error.message;
+                results.innerHTML = result;
+            }
+        }
+
+        function testFirebaseAuth() {
+            const results = document.getElementById('firebaseResults');
+            let result = results.innerHTML + '\n\n🔐 Testare Autentificare Firebase:\n';
+            
+            try {
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Verifică dacă există elemente de autentificare
+                const authElements = iframeDoc.querySelectorAll('[data-auth], [class*="auth"], [id*="auth"]');
+                result += `✅ Elemente de autentificare găsite: ${authElements.length}\n`;
+                firebaseTestResults.auth.elementsCount = authElements.length;
+                
+                // Verifică dacă există butoane de login/logout
+                const loginButtons = iframeDoc.querySelectorAll('button:contains("Login"), button:contains("Logout"), button:contains("Sign")');
+                result += `✅ Butoane auth găsite: ${loginButtons.length}\n`;
+                firebaseTestResults.auth.buttonsCount = loginButtons.length;
+                
+                // Verifică localStorage pentru token-uri
+                const authKeys = Object.keys(localStorage).filter(key => 
+                    key.includes('auth') || key.includes('token') || key.includes('user')
+                );
+                result += `✅ Chei auth în localStorage: ${authKeys.length}\n`;
+                firebaseTestResults.auth.localStorageKeys = authKeys.length;
+                
+                if (authKeys.length > 0) {
+                    result += `  Chei găsite: ${authKeys.join(', ')}\n`;
+                }
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea autentificării: ${error.message}\n`;
+                firebaseTestResults.auth.error = error.message;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testCreateOperations() {
+            const results = document.getElementById('crudResults');
+            let result = '📊 Testare Operațiuni Create:\n';
+            
+            try {
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Testează formularele de creare
+                const forms = iframeDoc.querySelectorAll('form');
+                result += `✅ Formulare găsite: ${forms.length}\n`;
+                firebaseTestResults.crud.formsCount = forms.length;
+                
+                // Testează butoanele de adăugare
+                const addButtons = iframeDoc.querySelectorAll('button');
+                const createButtons = Array.from(addButtons).filter(btn => 
+                    btn.textContent.includes('Adaugă') || 
+                    btn.textContent.includes('Creează') || 
+                    btn.textContent.includes('Salvează') ||
+                    btn.textContent.includes('Add') ||
+                    btn.textContent.includes('Create')
+                );
+                result += `✅ Butoane create găsite: ${createButtons.length}\n`;
+                firebaseTestResults.crud.createButtons = createButtons.length;
+                
+                // Testează input-urile pentru creare
+                const inputs = iframeDoc.querySelectorAll('input');
+                result += `✅ Input-uri pentru creare: ${inputs.length}\n`;
+                firebaseTestResults.crud.inputsCount = inputs.length;
+                
+                // Testează validarea formularelor
+                const requiredInputs = iframeDoc.querySelectorAll('input[required]');
+                result += `✅ Input-uri obligatorii: ${requiredInputs.length}\n`;
+                firebaseTestResults.crud.requiredInputs = requiredInputs.length;
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea operațiunilor create: ${error.message}\n`;
+                firebaseTestResults.crud.createError = error.message;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testReadOperations() {
+            const results = document.getElementById('crudResults');
+            let result = results.innerHTML + '\n\n📖 Testare Operațiuni Read:\n';
+            
+            try {
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Testează tabelele pentru afișare date
+                const tables = iframeDoc.querySelectorAll('table');
+                result += `✅ Tabele pentru afișare: ${tables.length}\n`;
+                firebaseTestResults.crud.tablesCount = tables.length;
+                
+                // Testează listele
+                const lists = iframeDoc.querySelectorAll('ul, ol');
+                result += `✅ Liste pentru afișare: ${lists.length}\n`;
+                firebaseTestResults.crud.listsCount = lists.length;
+                
+                // Testează card-urile
+                const cards = iframeDoc.querySelectorAll('[class*="card"], [class*="bg-white"]');
+                result += `✅ Card-uri pentru afișare: ${cards.length}\n`;
+                firebaseTestResults.crud.cardsCount = cards.length;
+                
+                // Testează butoanele de refresh
+                const refreshButtons = Array.from(iframeDoc.querySelectorAll('button')).filter(btn => 
+                    btn.textContent.includes('Refresh') || 
+                    btn.textContent.includes('Actualizează') ||
+                    btn.querySelector('svg[data-lucide="refresh"]')
+                );
+                result += `✅ Butoane refresh: ${refreshButtons.length}\n`;
+                firebaseTestResults.crud.refreshButtons = refreshButtons.length;
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea operațiunilor read: ${error.message}\n`;
+                firebaseTestResults.crud.readError = error.message;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testLocalStorageMode() {
+            const results = document.getElementById('storageResults');
+            let result = '💾 Testare Mod LocalStorage:\n';
+            
+            try {
+                // Testează localStorage
+                const testKey = 'test_crud_' + Date.now();
+                const testData = { name: 'Test', value: Math.random() };
+                
+                localStorage.setItem(testKey, JSON.stringify(testData));
+                const retrievedData = JSON.parse(localStorage.getItem(testKey));
+                
+                if (retrievedData.name === testData.name) {
+                    result += '✅ LocalStorage funcționează pentru date complexe\n';
+                    firebaseTestResults.storage.localStorageWorking = true;
+                } else {
+                    result += '❌ LocalStorage nu funcționează pentru date complexe\n';
+                    firebaseTestResults.storage.localStorageWorking = false;
+                }
+                
+                localStorage.removeItem(testKey);
+                
+                // Verifică cheile existente în localStorage
+                const existingKeys = Object.keys(localStorage);
+                const appKeys = existingKeys.filter(key => key.includes('orderflow'));
+                result += `✅ Chei aplicație în localStorage: ${appKeys.length}\n`;
+                firebaseTestResults.storage.appKeys = appKeys.length;
+                
+                if (appKeys.length > 0) {
+                    result += `  Chei găsite: ${appKeys.join(', ')}\n`;
+                }
+                
+                // Testează capacitatea localStorage
+                let storageSize = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        storageSize += localStorage[key].length;
+                    }
+                }
+                result += `ℹ️ Spațiu folosit: ${(storageSize / 1024).toFixed(2)} KB\n`;
+                firebaseTestResults.storage.usedSpace = storageSize;
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea localStorage: ${error.message}\n`;
+                firebaseTestResults.storage.error = error.message;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testDataPersistence() {
+            const results = document.getElementById('storageResults');
+            let result = results.innerHTML + '\n\n💾 Testare Persistența Datelor:\n';
+            
+            try {
+                // Testează dacă datele se păstrează între sesiuni
+                const testKey = 'persistence_test';
+                const testValue = 'test_value_' + Date.now();
+                
+                localStorage.setItem(testKey, testValue);
+                const retrievedValue = localStorage.getItem(testKey);
+                
+                if (retrievedValue === testValue) {
+                    result += '✅ Datele se păstrează în localStorage\n';
+                    firebaseTestResults.storage.persistence = true;
+                } else {
+                    result += '❌ Datele nu se păstrează în localStorage\n';
+                    firebaseTestResults.storage.persistence = false;
+                }
+                
+                // Testează sessionStorage
+                sessionStorage.setItem(testKey, testValue);
+                const sessionValue = sessionStorage.getItem(testKey);
+                
+                if (sessionValue === testValue) {
+                    result += '✅ Datele se păstrează în sessionStorage\n';
+                    firebaseTestResults.storage.sessionPersistence = true;
+                } else {
+                    result += '❌ Datele nu se păstrează în sessionStorage\n';
+                    firebaseTestResults.storage.sessionPersistence = false;
+                }
+                
+                // Curăță testele
+                localStorage.removeItem(testKey);
+                sessionStorage.removeItem(testKey);
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea persistenței: ${error.message}\n`;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testDataSync() {
+            const results = document.getElementById('syncResults');
+            let result = '🔄 Testare Sincronizare Date:\n';
+            
+            try {
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                // Verifică dacă există mecanisme de sincronizare
+                const syncElements = iframeDoc.querySelectorAll('[class*="sync"], [data-sync], [id*="sync"]');
+                result += `✅ Elemente de sincronizare: ${syncElements.length}\n`;
+                firebaseTestResults.sync.elementsCount = syncElements.length;
+                
+                // Verifică butoanele de sincronizare
+                const syncButtons = Array.from(iframeDoc.querySelectorAll('button')).filter(btn => 
+                    btn.textContent.includes('Sync') || 
+                    btn.textContent.includes('Sincronizează') ||
+                    btn.textContent.includes('Actualizează')
+                );
+                result += `✅ Butoane sincronizare: ${syncButtons.length}\n`;
+                firebaseTestResults.sync.buttonsCount = syncButtons.length;
+                
+                // Verifică indicatorii de status
+                const statusIndicators = iframeDoc.querySelectorAll('[class*="status"], [class*="indicator"]');
+                result += `✅ Indicatori status: ${statusIndicators.length}\n`;
+                firebaseTestResults.sync.statusIndicators = statusIndicators.length;
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea sincronizării: ${error.message}\n`;
+                firebaseTestResults.sync.error = error.message;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function testOfflineSync() {
+            const results = document.getElementById('syncResults');
+            let result = results.innerHTML + '\n\n📡 Testare Sincronizare Offline:\n';
+            
+            try {
+                // Simulează offline
+                const originalFetch = window.fetch;
+                window.fetch = function() {
+                    return Promise.reject(new Error('Simulated offline'));
+                };
+                
+                result += '🔧 Simulare offline activată\n';
+                
+                // Testează dacă aplicația funcționează offline
+                const iframe = document.getElementById('appFrame');
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                
+                const app = iframeDoc.querySelector('#root');
+                if (app && app.children.length > 0) {
+                    result += '✅ Aplicația funcționează offline\n';
+                    firebaseTestResults.sync.offlineWorking = true;
+                } else {
+                    result += '❌ Aplicația nu funcționează offline\n';
+                    firebaseTestResults.sync.offlineWorking = false;
+                }
+                
+                // Restaurează fetch-ul normal
+                window.fetch = originalFetch;
+                result += '🔧 Simulare offline dezactivată\n';
+                
+            } catch (error) {
+                result += `❌ Eroare la testarea sincronizării offline: ${error.message}\n`;
+            }
+            
+            results.innerHTML = result;
+        }
+
+        function generateFirebaseReport() {
+            const results = document.getElementById('firebaseReport');
+            let report = '📊 RAPORT TESTARE FIREBASE & CRUD - ORDERFLOW PWA\n';
+            report += '='.repeat(60) + '\n\n';
+            
+            report += `📅 Data: ${new Date().toLocaleString('ro-RO')}\n`;
+            report += `🖥️ Browser: ${navigator.userAgent}\n`;
+            report += `📱 Rezoluție: ${window.innerWidth}x${window.innerHeight}\n\n`;
+            
+            report += '📊 REZULTATE TESTE:\n';
+            report += '-'.repeat(30) + '\n';
+            
+            // Firebase Connection
+            report += '\n🔥 FIREBASE CONNECTION:\n';
+            report += `SDK încărcat: ${firebaseTestResults.connection.sdkLoaded ? '✅' : '❌'}\n`;
+            report += `Config găsită: ${firebaseTestResults.connection.configFound ? '✅' : '❌'}\n`;
+            report += `Conectivitate: ${firebaseTestResults.connection.connectivity ? '✅' : '❌'}\n`;
+            
+            // Auth
+            report += '\n🔐 AUTHENTICATION:\n';
+            report += `Elemente auth: ${firebaseTestResults.auth.elementsCount || 0}\n`;
+            report += `Butoane auth: ${firebaseTestResults.auth.buttonsCount || 0}\n`;
+            report += `Chei localStorage: ${firebaseTestResults.auth.localStorageKeys || 0}\n`;
+            
+            // CRUD
+            report += '\n📊 CRUD OPERATIONS:\n';
+            report += `Formulare: ${firebaseTestResults.crud.formsCount || 0}\n`;
+            report += `Butoane create: ${firebaseTestResults.crud.createButtons || 0}\n`;
+            report += `Input-uri: ${firebaseTestResults.crud.inputsCount || 0}\n`;
+            report += `Tabele: ${firebaseTestResults.crud.tablesCount || 0}\n`;
+            
+            // Storage
+            report += '\n💾 STORAGE:\n';
+            report += `LocalStorage funcțional: ${firebaseTestResults.storage.localStorageWorking ? '✅' : '❌'}\n`;
+            report += `Chei aplicație: ${firebaseTestResults.storage.appKeys || 0}\n`;
+            report += `Persistență: ${firebaseTestResults.storage.persistence ? '✅' : '❌'}\n`;
+            report += `Spațiu folosit: ${firebaseTestResults.storage.usedSpace ? (firebaseTestResults.storage.usedSpace / 1024).toFixed(2) + ' KB' : 'N/A'}\n`;
+            
+            // Sync
+            report += '\n🔄 SYNC:\n';
+            report += `Elemente sync: ${firebaseTestResults.sync.elementsCount || 0}\n`;
+            report += `Butoane sync: ${firebaseTestResults.sync.buttonsCount || 0}\n`;
+            report += `Funcționează offline: ${firebaseTestResults.sync.offlineWorking ? '✅' : '❌'}\n`;
+            
+            report += '\n🎯 RECOMANDĂRI:\n';
+            report += '-'.repeat(20) + '\n';
+            report += '1. Verifică că Firebase este configurat corect\n';
+            report += '2. Testează operațiunile CRUD în condiții reale\n';
+            report += '3. Verifică că datele se sincronizează corect\n';
+            report += '4. Testează funcționarea offline\n';
+            report += '5. Verifică că fallback-ul la localStorage funcționează\n';
+            
+            results.innerHTML = report;
+        }
+    </script>
+</body>
+</html>

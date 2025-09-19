@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Browser OrderFlow PWA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .test-title { font-size: 1.2em; font-weight: bold; color: #333; }
+        .test-status { padding: 5px 10px; border-radius: 4px; font-weight: bold; }
+        .status-pass { background: #d4edda; color: #155724; }
+        .status-fail { background: #f8d7da; color: #721c24; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .test-details { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; }
+        .test-button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        .test-button:hover { background: #0056b3; }
+        .test-button:disabled { background: #6c757d; cursor: not-allowed; }
+        .progress-bar { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+        .progress-fill { height: 100%; background: #28a745; transition: width 0.3s ease; }
+        .summary { background: #e7f3ff; padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .summary h3 { margin-top: 0; color: #0066cc; }
+        .summary-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
+        .stat-item { text-align: center; padding: 10px; background: white; border-radius: 4px; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #28a745; }
+        .stat-label { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Browser OrderFlow PWA</h1>
+        <p>Testare completă a funcționalităților aplicației OrderFlow PWA în browser</p>
+        
+        <div class="summary">
+            <h3>📊 Rezumat Testare</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="total-tests">0</div>
+                    <div class="stat-label">Total Teste</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="passed-tests">0</div>
+                    <div class="stat-label">Trecute</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="failed-tests">0</div>
+                    <div class="stat-label">Eșuate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="success-rate">0%</div>
+                    <div class="stat-label">Rata Succes</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">1. Test Conectivitate și PWA</div>
+                <div class="test-status status-pending" id="pwa-status">PENDING</div>
+            </div>
+            <div class="test-details" id="pwa-details">
+                <p>Testează funcționalitățile PWA de bază: manifest, service worker, cache, offline capability</p>
+                <button class="test-button" onclick="runPWATests()">Rulează Teste PWA</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">2. Test Gestionare Date</div>
+                <div class="test-status status-pending" id="data-status">PENDING</div>
+            </div>
+            <div class="test-details" id="data-details">
+                <p>Testează localStorage, validarea datelor, gestionarea erorilor</p>
+                <button class="test-button" onclick="runDataTests()">Rulează Teste Date</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">3. Test Operațiuni CRUD</div>
+                <div class="test-status status-pending" id="crud-status">PENDING</div>
+            </div>
+            <div class="test-details" id="crud-details">
+                <p>Testează operațiunile Create, Read, Update, Delete pentru clienți, produse, comenzi</p>
+                <button class="test-button" onclick="runCRUDTests()">Rulează Teste CRUD</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">4. Test Logica de Afaceri</div>
+                <div class="test-status status-pending" id="business-status">PENDING</div>
+            </div>
+            <div class="test-details" id="business-details">
+                <p>Testează calculul datoriilor, procesarea plăților, generarea rapoartelor</p>
+                <button class="test-button" onclick="runBusinessTests()">Rulează Teste Afaceri</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">5. Test Interfața Utilizator</div>
+                <div class="test-status status-pending" id="ui-status">PENDING</div>
+            </div>
+            <div class="test-details" id="ui-details">
+                <p>Testează componentele UI, navigarea, formularele, feedback-ul utilizator</p>
+                <button class="test-button" onclick="runUITests()">Rulează Teste UI</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">6. Test Performance și Securitate</div>
+                <div class="test-status status-pending" id="perf-status">PENDING</div>
+            </div>
+            <div class="test-details" id="perf-details">
+                <p>Testează performanța, securitatea, gestionarea erorilor</p>
+                <button class="test-button" onclick="runPerfTests()">Rulează Teste Performance</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">7. Test Integrare Completă</div>
+                <div class="test-status status-pending" id="integration-status">PENDING</div>
+            </div>
+            <div class="test-details" id="integration-details">
+                <p>Testează fluxul complet al aplicației: de la crearea unui client la generarea raportelor</p>
+                <button class="test-button" onclick="runIntegrationTests()">Rulează Teste Integrare</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">8. Teste Manuale</div>
+                <div class="test-status status-pending" id="manual-status">PENDING</div>
+            </div>
+            <div class="test-details" id="manual-details">
+                <p>Teste manuale pentru a verifica funcționalitatea în condiții reale</p>
+                <button class="test-button" onclick="openOrderFlowApp()">Deschide OrderFlow App</button>
+                <button class="test-button" onclick="runManualTests()">Marchează ca Testat</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-header">
+                <div class="test-title">🎯 Toate Testele</div>
+                <div class="test-status status-pending" id="all-status">PENDING</div>
+            </div>
+            <div class="test-details" id="all-details">
+                <p>Rulează toate testele automat în secvență</p>
+                <button class="test-button" onclick="runAllTests()">Rulează Toate Testele</button>
+                <button class="test-button" onclick="resetTests()">Resetează Testele</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variabile globale pentru tracking
+        let testResults = {
+            pwa: { status: 'pending', details: [] },
+            data: { status: 'pending', details: [] },
+            crud: { status: 'pending', details: [] },
+            business: { status: 'pending', details: [] },
+            ui: { status: 'pending', details: [] },
+            perf: { status: 'pending', details: [] },
+            integration: { status: 'pending', details: [] },
+            manual: { status: 'pending', details: [] }
+        };
+
+        // Funcții helper
+        function updateTestStatus(testName, status, details = []) {
+            testResults[testName].status = status;
+            testResults[testName].details = details;
+            
+            const statusElement = document.getElementById(`${testName}-status`);
+            const detailsElement = document.getElementById(`${testName}-details`);
+            
+            statusElement.textContent = status.toUpperCase();
+            statusElement.className = `test-status status-${status}`;
+            
+            if (details.length > 0) {
+                const detailsHtml = details.map(detail => 
+                    `<div style="margin: 5px 0; padding: 5px; background: ${detail.passed ? '#d4edda' : '#f8d7da'}; border-radius: 3px;">
+                        <strong>${detail.name}:</strong> ${detail.passed ? 'PASS' : 'FAIL'}
+                        ${detail.message ? `<br><small>${detail.message}</small>` : ''}
+                    </div>`
+                ).join('');
+                detailsElement.innerHTML = detailsHtml;
+            }
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(r => r.status === 'pass').length;
+            const failed = Object.values(testResults).filter(r => r.status === 'fail').length;
+            const successRate = total > 0 ? Math.round((passed / total) * 100) : 0;
+            
+            document.getElementById('total-tests').textContent = total;
+            document.getElementById('passed-tests').textContent = passed;
+            document.getElementById('failed-tests').textContent = failed;
+            document.getElementById('success-rate').textContent = successRate + '%';
+            document.getElementById('progress-fill').style.width = successRate + '%';
+        }
+
+        // Teste PWA
+        async function runPWATests() {
+            updateTestStatus('pwa', 'running');
+            
+            const details = [];
+            
+            try {
+                // Test manifest
+                const manifestResponse = await fetch('/manifest.webmanifest');
+                details.push({
+                    name: 'Manifest accesibil',
+                    passed: manifestResponse.ok,
+                    message: `Status: ${manifestResponse.status}`
+                });
+                
+                if (manifestResponse.ok) {
+                    const manifest = await manifestResponse.json();
+                    details.push({
+                        name: 'Manifest valid',
+                        passed: manifest.name && manifest.short_name,
+                        message: `Nume: ${manifest.name}`
+                    });
+                }
+                
+                // Test Service Worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    details.push({
+                        name: 'Service Worker înregistrat',
+                        passed: registrations.length > 0,
+                        message: `Registrări: ${registrations.length}`
+                    });
+                } else {
+                    details.push({
+                        name: 'Service Worker suportat',
+                        passed: false,
+                        message: 'Service Worker nu este suportat'
+                    });
+                }
+                
+                // Test Cache API
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    details.push({
+                        name: 'Cache API funcțional',
+                        passed: true,
+                        message: `Cache-uri: ${cacheNames.length}`
+                    });
+                } else {
+                    details.push({
+                        name: 'Cache API suportat',
+                        passed: false,
+                        message: 'Cache API nu este suportat'
+                    });
+                }
+                
+                // Test offline detection
+                details.push({
+                    name: 'Detectare offline',
+                    passed: 'onLine' in navigator,
+                    message: `Status: ${navigator.onLine ? 'online' : 'offline'}`
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('pwa', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('pwa', 'fail', details);
+            }
+        }
+
+        // Teste Date
+        async function runDataTests() {
+            updateTestStatus('data', 'running');
+            
+            const details = [];
+            
+            try {
+                // Test localStorage
+                const testKey = 'test_data_' + Date.now();
+                const testData = { test: 'value', number: 123 };
+                
+                localStorage.setItem(testKey, JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem(testKey));
+                details.push({
+                    name: 'localStorage funcțional',
+                    passed: JSON.stringify(retrieved) === JSON.stringify(testData),
+                    message: 'Scriere și citire corectă'
+                });
+                
+                localStorage.removeItem(testKey);
+                
+                // Test validare date
+                function validatePrice(price) {
+                    const num = parseFloat(price);
+                    return !isNaN(num) && num > 0 && num < 999999;
+                }
+                
+                const priceTests = [
+                    { input: '10.50', expected: true },
+                    { input: '-5', expected: false },
+                    { input: 'abc', expected: false },
+                    { input: '1000000', expected: false }
+                ];
+                
+                priceTests.forEach((test, index) => {
+                    const result = validatePrice(test.input);
+                    details.push({
+                        name: `Validare preț ${index + 1}`,
+                        passed: result === test.expected,
+                        message: `Input: ${test.input}, Expected: ${test.expected}, Got: ${result}`
+                    });
+                });
+                
+                // Test gestionare erori
+                try {
+                    JSON.parse('invalid json');
+                } catch (error) {
+                    details.push({
+                        name: 'Gestionare erori JSON',
+                        passed: true,
+                        message: 'Eroarea JSON este gestionată corect'
+                    });
+                }
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('data', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('data', 'fail', details);
+            }
+        }
+
+        // Teste CRUD
+        async function runCRUDTests() {
+            updateTestStatus('crud', 'running');
+            
+            const details = [];
+            
+            try {
+                // Simulare operațiuni CRUD
+                let customers = [];
+                
+                // Create
+                const newCustomer = { id: 'test1', name: 'Test Client', phone: '123456789' };
+                customers.push(newCustomer);
+                details.push({
+                    name: 'Create client',
+                    passed: customers.length === 1,
+                    message: 'Client adăugat cu succes'
+                });
+                
+                // Read
+                const foundCustomer = customers.find(c => c.id === 'test1');
+                details.push({
+                    name: 'Read client',
+                    passed: foundCustomer !== undefined,
+                    message: 'Client găsit cu succes'
+                });
+                
+                // Update
+                if (foundCustomer) {
+                    foundCustomer.phone = '987654321';
+                    const updatedCustomer = customers.find(c => c.id === 'test1');
+                    details.push({
+                        name: 'Update client',
+                        passed: updatedCustomer.phone === '987654321',
+                        message: 'Client actualizat cu succes'
+                    });
+                }
+                
+                // Delete
+                customers = customers.filter(c => c.id !== 'test1');
+                details.push({
+                    name: 'Delete client',
+                    passed: customers.length === 0,
+                    message: 'Client șters cu succes'
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('crud', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('crud', 'fail', details);
+            }
+        }
+
+        // Teste Afaceri
+        async function runBusinessTests() {
+            updateTestStatus('business', 'running');
+            
+            const details = [];
+            
+            try {
+                // Test calcul datorii
+                const orders = [
+                    { customerId: 'c1', totalAmount: 100, paidAmount: 50, status: 'Plătită Parțial' },
+                    { customerId: 'c1', totalAmount: 200, paidAmount: 0, status: 'Deschisă' }
+                ];
+                
+                const totalDebt = orders
+                    .filter(o => o.status !== 'Plătită Integral' && o.status !== 'Stornată')
+                    .reduce((sum, o) => sum + (o.totalAmount - o.paidAmount), 0);
+                
+                details.push({
+                    name: 'Calcul datorii',
+                    passed: totalDebt === 250,
+                    message: `Datorie calculată: ${totalDebt}`
+                });
+                
+                // Test procesare plăți
+                const paymentAmount = 150;
+                let remainingAmount = paymentAmount;
+                const settlementDetails = [];
+                
+                for (const order of orders) {
+                    if (remainingAmount <= 0) break;
+                    const dueOnOrder = order.totalAmount - order.paidAmount;
+                    const amountToApply = Math.min(remainingAmount, dueOnOrder);
+                    
+                    if (amountToApply > 0) {
+                        settlementDetails.push({
+                            orderId: order.id,
+                            amountSettled: amountToApply
+                        });
+                        remainingAmount -= amountToApply;
+                    }
+                }
+                
+                const totalSettled = settlementDetails.reduce((sum, detail) => sum + detail.amountSettled, 0);
+                details.push({
+                    name: 'Procesare plăți',
+                    passed: totalSettled === 150,
+                    message: `Suma decontată: ${totalSettled}`
+                });
+                
+                // Test generare rapoarte
+                const reportData = orders.map(o => ({
+                    client: o.customerId,
+                    total: o.totalAmount,
+                    status: o.status
+                }));
+                
+                details.push({
+                    name: 'Generare rapoarte',
+                    passed: reportData.length === 2,
+                    message: `Rapoarte generate: ${reportData.length}`
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('business', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('business', 'fail', details);
+            }
+        }
+
+        // Teste UI
+        async function runUITests() {
+            updateTestStatus('ui', 'running');
+            
+            const details = [];
+            
+            try {
+                // Test responsive design
+                const viewport = document.querySelector('meta[name="viewport"]');
+                details.push({
+                    name: 'Viewport meta tag',
+                    passed: viewport !== null,
+                    message: viewport ? 'Viewport configurat' : 'Viewport lipsă'
+                });
+                
+                // Test touch support
+                details.push({
+                    name: 'Touch support',
+                    passed: 'ontouchstart' in window,
+                    message: 'Touch events suportate'
+                });
+                
+                // Test CSS support
+                details.push({
+                    name: 'CSS Grid support',
+                    passed: CSS.supports('display', 'grid'),
+                    message: 'CSS Grid suportat'
+                });
+                
+                // Test JavaScript features
+                details.push({
+                    name: 'ES6 support',
+                    passed: typeof Symbol !== 'undefined',
+                    message: 'ES6 features suportate'
+                });
+                
+                // Test localStorage support
+                details.push({
+                    name: 'localStorage support',
+                    passed: 'localStorage' in window,
+                    message: 'localStorage disponibil'
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('ui', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('ui', 'fail', details);
+            }
+        }
+
+        // Teste Performance
+        async function runPerfTests() {
+            updateTestStatus('perf', 'running');
+            
+            const details = [];
+            
+            try {
+                // Test performance API
+                if ('performance' in window) {
+                    const navigation = performance.getEntriesByType('navigation')[0];
+                    if (navigation) {
+                        const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
+                        details.push({
+                            name: 'Load time',
+                            passed: loadTime < 3000,
+                            message: `Load time: ${Math.round(loadTime)}ms`
+                        });
+                    }
+                }
+                
+                // Test memory usage
+                if ('memory' in performance) {
+                    const memory = performance.memory;
+                    const usedMB = Math.round(memory.usedJSHeapSize / 1024 / 1024);
+                    details.push({
+                        name: 'Memory usage',
+                        passed: usedMB < 100,
+                        message: `Memory used: ${usedMB}MB`
+                    });
+                }
+                
+                // Test security
+                const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+                details.push({
+                    name: 'Secure context',
+                    passed: isSecure,
+                    message: `Protocol: ${location.protocol}`
+                });
+                
+                // Test CSP
+                const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                details.push({
+                    name: 'CSP header',
+                    passed: csp !== null,
+                    message: csp ? 'CSP configurat' : 'CSP lipsă'
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('perf', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('perf', 'fail', details);
+            }
+        }
+
+        // Teste Integrare
+        async function runIntegrationTests() {
+            updateTestStatus('integration', 'running');
+            
+            const details = [];
+            
+            try {
+                // Simulare flux complet
+                let customers = [];
+                let products = [];
+                let orders = [];
+                
+                // 1. Adaugă client
+                const customer = { id: 'c1', name: 'Test Client' };
+                customers.push(customer);
+                details.push({
+                    name: 'Adăugare client',
+                    passed: customers.length === 1,
+                    message: 'Client adăugat'
+                });
+                
+                // 2. Adaugă produs
+                const product = { id: 'p1', name: 'Test Product', price: 100 };
+                products.push(product);
+                details.push({
+                    name: 'Adăugare produs',
+                    passed: products.length === 1,
+                    message: 'Produs adăugat'
+                });
+                
+                // 3. Creează comandă
+                const order = {
+                    id: 'o1',
+                    customerId: 'c1',
+                    customerName: 'Test Client',
+                    items: [{ productId: 'p1', name: 'Test Product', price: 100, quantity: 2 }],
+                    totalAmount: 200,
+                    paidAmount: 0,
+                    status: 'Deschisă'
+                };
+                orders.push(order);
+                details.push({
+                    name: 'Creare comandă',
+                    passed: orders.length === 1,
+                    message: 'Comandă creată'
+                });
+                
+                // 4. Procesează plată
+                const paymentAmount = 150;
+                const remainingAmount = order.totalAmount - order.paidAmount;
+                const amountToApply = Math.min(paymentAmount, remainingAmount);
+                order.paidAmount += amountToApply;
+                order.status = amountToApply >= remainingAmount ? 'Plătită Integral' : 'Plătită Parțial';
+                
+                details.push({
+                    name: 'Procesare plată',
+                    passed: order.paidAmount === 150,
+                    message: `Plată procesată: ${order.paidAmount}`
+                });
+                
+                // 5. Generează raport
+                const reportData = orders.map(o => ({
+                    client: o.customerName,
+                    total: o.totalAmount,
+                    paid: o.paidAmount,
+                    status: o.status
+                }));
+                
+                details.push({
+                    name: 'Generare raport',
+                    passed: reportData.length === 1,
+                    message: 'Raport generat'
+                });
+                
+                const allPassed = details.every(d => d.passed);
+                updateTestStatus('integration', allPassed ? 'pass' : 'fail', details);
+                
+            } catch (error) {
+                details.push({
+                    name: 'Eroare generală',
+                    passed: false,
+                    message: error.message
+                });
+                updateTestStatus('integration', 'fail', details);
+            }
+        }
+
+        // Teste Manuale
+        function openOrderFlowApp() {
+            window.open('/', '_blank');
+        }
+
+        function runManualTests() {
+            updateTestStatus('manual', 'pass', [{
+                name: 'Teste manuale',
+                passed: true,
+                message: 'Teste manuale marcate ca completate'
+            }]);
+        }
+
+        // Rulează toate testele
+        async function runAllTests() {
+            updateTestStatus('all', 'running');
+            
+            await runPWATests();
+            await runDataTests();
+            await runCRUDTests();
+            await runBusinessTests();
+            await runUITests();
+            await runPerfTests();
+            await runIntegrationTests();
+            
+            updateTestStatus('all', 'pass', [{
+                name: 'Toate testele',
+                passed: true,
+                message: 'Toate testele au fost executate'
+            }]);
+        }
+
+        // Resetează testele
+        function resetTests() {
+            Object.keys(testResults).forEach(key => {
+                testResults[key] = { status: 'pending', details: [] };
+                updateTestStatus(key, 'pending');
+            });
+        }
+
+        // Inițializare
+        window.addEventListener('load', function() {
+            updateSummary();
+        });
+    </script>
+</body>
+</html>

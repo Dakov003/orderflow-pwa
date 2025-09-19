@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OrderFlow</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test OrderFlow App</h1>
+    <div id="status"></div>
+    
+    <script type="module">
+        const status = document.getElementById('status');
+        
+        function addStatus(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong> - ${message}`;
+            status.appendChild(div);
+        }
+        
+        try {
+            addStatus('🚀 Începând testul...', 'info');
+            
+            // Test 1: Verifică dacă aplicația principală se încarcă
+            addStatus('📦 Testând încărcarea aplicației principale...', 'info');
+            
+            // Încearcă să încarce aplicația principală
+            const response = await fetch('/');
+            if (response.ok) {
+                addStatus('✅ Aplicația principală este accesibilă', 'success');
+            } else {
+                addStatus(`❌ Eroare la accesarea aplicației: ${response.status}`, 'error');
+            }
+            
+            // Test 2: Verifică dacă există erori JavaScript
+            addStatus('🔍 Verificând erori JavaScript...', 'info');
+            
+            // Adaugă un event listener pentru erori
+            window.addEventListener('error', (e) => {
+                addStatus(`❌ Eroare JavaScript: ${e.message}`, 'error');
+                addStatus(`Fișier: ${e.filename}:${e.lineno}:${e.colno}`, 'error');
+            });
+            
+            // Test 3: Încearcă să încarce aplicația
+            addStatus('🎯 Încercând să încarce aplicația...', 'info');
+            
+            // Creează un iframe pentru a testa aplicația
+            const iframe = document.createElement('iframe');
+            iframe.src = '/';
+            iframe.style.width = '100%';
+            iframe.style.height = '600px';
+            iframe.style.border = '1px solid #ccc';
+            
+            iframe.onload = () => {
+                addStatus('✅ Aplicația s-a încărcat în iframe', 'success');
+            };
+            
+            iframe.onerror = () => {
+                addStatus('❌ Eroare la încărcarea aplicației în iframe', 'error');
+            };
+            
+            document.body.appendChild(iframe);
+            
+        } catch (error) {
+            addStatus(`💥 Eroare generală: ${error.message}`, 'error');
+        }
+    </script>
+</body>
+</html>
