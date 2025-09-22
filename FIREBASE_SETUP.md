@@ -1,108 +1,71 @@
-# Configurare Firebase pentru OrderFlow PWA
+# Firebase Setup pentru OrderFlow PWA
 
-## Configurare Rapidă (Recomandat)
+## 1. Creare Proiect în Google Firebase
 
-Aplicația OrderFlow funcționează **fără Firebase** folosind localStorage pentru stocare locală. Aceasta este configurația implicită și recomandată pentru început.
+1. Accesează [Firebase Console](https://console.firebase.google.com/)
+2. Click "Create a project" sau "Add project"
+3. Numele proiectului: `order-flow-28c1b`
+4. Activează Google Analytics (opțional)
+5. Alege regiunea (preferabil Europa pentru GDPR)
 
-## Configurare Firebase (Opțional)
+## 2. Configurare Authentication
 
-Dacă dorești să folosești Firebase pentru sincronizare în cloud, urmează acești pași:
+1. În Firebase Console → Authentication
+2. Click "Get started"
+3. Tab "Sign-in method"
+4. Activează "Anonymous" (implicit)
+5. Click "Save"
 
-### 1. Creează un proiect Firebase
+## 3. Configurare Cloud Firestore
 
-1. Mergi la [Firebase Console](https://console.firebase.google.com/)
-2. Apasă "Add project"
-3. Introdu numele proiectului (ex: "orderflow-pwa")
-4. Urmărește pașii de configurare
+1. În Firebase Console → Firestore Database
+2. Click "Create database"
+3. Alege "Start in production mode"
+4. Alege regiunea (preferabil `europe-west1`)
 
-### 2. Activează Firestore Database
+## 4. Deploy Firestore Rules
 
-1. În Firebase Console, mergi la "Firestore Database"
-2. Apasă "Create database"
-3. Alege "Start in test mode" (pentru început)
-4. Selectează o locație pentru baza de date
+1. Instalează Firebase CLI: `npm install -g firebase-tools`
+2. Login: `firebase login`
+3. Inițializează proiectul: `firebase init firestore`
+4. Deploy rules: `firebase deploy --only firestore:rules`
 
-### 3. Obține configurația
+## 5. Configurare Environment Variables
 
-1. Mergi la "Project Settings" (iconița de roată)
-2. Scroll jos la "Your apps"
-3. Apasă "Add app" și alege "Web" (iconița `</>`)
-4. Introdu numele aplicației (ex: "OrderFlow PWA")
-5. Copiază configurația Firebase
-
-### 4. Configurează variabilele de mediu
-
-Creează un fișier `.env` în directorul rădăcină:
+Creează fișierul `.env.local` în root-ul proiectului:
 
 ```env
-# Firebase Configuration
-VITE_FIREBASE_CONFIG={"apiKey":"your-api-key","authDomain":"your-project.firebaseapp.com","projectId":"your-project","storageBucket":"your-project.appspot.com","messagingSenderId":"123456789","appId":"1:123456789:web:abcdef123456"}
-
-# App ID pentru identificarea aplicației
-VITE_APP_ID=orderflow-pwa
-
-# Token de autentificare inițial (opțional)
-# VITE_INITIAL_AUTH_TOKEN=your-custom-token-here
+VITE_FIREBASE_API_KEY=AIzaSyBM4X0As-EWrtT_vB4x2QzTj5cGNbQjAFQ
+VITE_FIREBASE_AUTH_DOMAIN=order-flow-28c1b.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=order-flow-28c1b
+VITE_FIREBASE_STORAGE_BUCKET=order-flow-28c1b.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=1010218778659
+VITE_FIREBASE_APP_ID=1:1010218778659:web:e325c41bae8c2c284df196
+VITE_FIREBASE_MEASUREMENT_ID=G-NCGV5RTL86
+VITE_APP_ID=order-flow-28c1b
+VITE_INITIAL_AUTH_TOKEN=
 ```
 
-### 5. Regulile de securitate Firestore
-
-În Firebase Console, mergi la "Firestore Database" > "Rules" și înlocuiește cu:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Permite accesul la toate documentele pentru simplitate
-    // În producție, configurează reguli mai stricte
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}
-```
-
-### 6. Restart aplicația
+## 6. Testare Local
 
 ```bash
 npm run dev
 ```
 
-## Funcționalități
+Verifică în browser console că nu apar erori Firebase.
 
-### Cu Firebase
-- ✅ Sincronizare în cloud
-- ✅ Backup automat
-- ✅ Acces multiplu utilizatori
-- ✅ Funcționare offline cu sincronizare
+## 7. Structura Colecțiilor Firestore
 
-### Fără Firebase (localStorage)
-- ✅ Funcționare completă offline
-- ✅ Stocare locală sigură
-- ✅ Performanță optimă
-- ✅ Fără configurare necesară
+Aplicația va crea automat următoarele colecții:
 
-## Depanare
+- `/artifacts/order-flow-28c1b/public/data/customers`
+- `/artifacts/order-flow-28c1b/public/data/products`
+- `/artifacts/order-flow-28c1b/public/data/orders`
+- `/artifacts/order-flow-28c1b/public/data/payments`
+- `/artifacts/order-flow-28c1b/public/data/dayClosings`
 
-### Eroarea "Firebase config is missing"
-- Aplicația va folosi automat localStorage
-- Nu este o problemă, funcționează normal
+## 8. Securitate
 
-### Probleme de conectivitate
-- Aplicația funcționează offline
-- Datele se sincronizează când se restabilește conexiunea
-
-### Reset date
-Pentru a reseta toate datele (localStorage):
-```javascript
-// Rulează în consolă browser
-localStorage.clear();
-location.reload();
-```
-
-## Suport
-
-Pentru probleme tehnice, verifică:
-1. Console-ul browser pentru erori
-2. Configurația Firebase (dacă folosești)
-3. Conexiunea la internet (pentru sincronizare)
+- Toate datele sunt protejate prin Firestore Rules
+- Doar utilizatorii autentificați pot accesa datele
+- Regulile sunt restrictive și permit doar accesul la path-ul specificat

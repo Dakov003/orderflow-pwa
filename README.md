@@ -1,186 +1,157 @@
-# 🚀 OrderFlow PWA - Gestiune Comenzi
+# OrderFlow PWA
 
-O aplicație PWA (Progressive Web App) modernă pentru gestiunea comenzilor, clienților și produselor, dezvoltată cu React, TypeScript și Vite.
+O aplicație PWA (Progressive Web App) pentru gestionarea comenzilor, construită cu React, Vite, Firebase și Tailwind CSS.
 
-## ✨ Funcționalități
+## 🚀 Caracteristici
 
-- 📱 **PWA Completă** - Instalabilă pe desktop și mobile
-- 🔄 **Funcționare Offline** - Folosește localStorage pentru date locale
-- 📊 **Dashboard** - Statistici și rapoarte în timp real
-- 👥 **Gestiune Clienți** - CRUD complet pentru clienți
-- 📦 **Gestiune Produse** - Catalog de produse cu prețuri
-- 💰 **Sistem Plăți** - Urmărire plăți și datorii
-- 📈 **Rapoarte** - Export CSV și rapoarte detaliate
-- 🔒 **Siguranță** - Datele rămân pe dispozitivul tău
+- **PWA completă** - Instalabilă pe dispozitive mobile și desktop
+- **Offline-first** - Funcționează fără conexiune la internet
+- **Firebase Backend** - Autentificare și Firestore pentru date
+- **Responsive Design** - Optimizată pentru toate dispozitivele
+- **Tailwind CSS** - Design modern și consistent
 
-## 🛠️ Tehnologii
+## 📋 Cerințe
 
-- **Frontend:** React 18 + TypeScript
-- **Build Tool:** Vite
-- **UI:** Tailwind CSS
-- **PWA:** Vite PWA Plugin + Workbox
-- **State Management:** React Hooks
-- **Icons:** Lucide React
-
-## 🚀 Instalare Locală
-
-### Cerințe
-- Node.js 18+
+- Node.js 20+
 - npm sau yarn
+- Cont Firebase
+- Cont GitHub (pentru deploy)
 
-### Pași de instalare
+## 🛠️ Instalare și Configurare
 
-1. **Clonează repository-ul:**
-   ```bash
-   git clone https://github.com/TU_USERNAME/orderflow-pwa.git
-   cd orderflow-pwa
-   ```
-
-2. **Instalează dependențele:**
-   ```bash
-   npm install
-   ```
-
-3. **Pornește aplicația:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Deschide în browser:**
-   - Development: `http://localhost:5173`
-   - Preview: `http://localhost:4173` (după `npm run build`)
-
-## 📱 Instalare PWA
-
-### Pe Desktop (Windows/Mac/Linux):
-1. Deschide aplicația în Chrome/Edge/Firefox
-2. Caută iconița de instalare în bara de adresă
-3. Apasă "Instalează" și confirmă
-4. Aplicația va apărea în meniul Start/Applications
-
-### Pe Android:
-1. Deschide aplicația în Chrome
-2. Așteaptă notificarea "Instalează aplicația"
-3. Apasă "Instalează" și confirmă
-4. Aplicația va apărea în lista de aplicații
-
-### Pe iOS:
-1. Deschide aplicația în Safari
-2. Apasă pe butonul de partajare (□↗)
-3. Selectează "Adaugă la ecranul principal"
-
-## 🌐 Deployment
-
-Aplicația este configurată pentru deployment pe GitHub Pages:
-
-1. **Fork** acest repository
-2. **Activează GitHub Pages** în Settings → Pages
-3. **Alege "GitHub Actions"** ca sursă
-4. **Push** modificările - deployment-ul se face automat
-
-URL-ul aplicației va fi: `https://TU_USERNAME.github.io/orderflow-pwa/`
-
-## 📊 Scripturi Disponibile
+### 1. Clonează repository-ul
 
 ```bash
-# Development
-npm run dev          # Pornește server de development
-
-# Build
-npm run build        # Construiește pentru producție
-npm run preview      # Preview build-ul de producție
-
-# Linting
-npm run lint         # Verifică codul cu ESLint
+git clone https://github.com/Dakov003/orderflow-pwa.git
+cd orderflow-pwa
 ```
 
-## 🔧 Configurare
+### 2. Instalează dependențele
 
-### Variabile de Mediu (Opțional)
+```bash
+npm install
+```
 
-Creează un fișier `.env` pentru configurare Firebase:
+### 3. Configurează Firebase
+
+Urmărește instrucțiunile din [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) pentru a configura Firebase.
+
+### 4. Configurează variabilele de mediu
+
+Creează fișierul `.env.local` în root-ul proiectului:
 
 ```env
-VITE_FIREBASE_CONFIG={"apiKey":"...","authDomain":"...","projectId":"...","storageBucket":"...","messagingSenderId":"...","appId":"..."}
-VITE_APP_ID=orderflow-pwa
+VITE_FIREBASE_API_KEY=your_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+VITE_APP_ID=order-flow-28c1b
+VITE_INITIAL_AUTH_TOKEN=
 ```
 
-**Notă:** Aplicația funcționează perfect fără Firebase, folosind localStorage.
+### 5. Rulează aplicația local
 
-## 📁 Structura Proiectului
+```bash
+npm run dev
+```
+
+Aplicația va fi disponibilă la `http://localhost:5173`
+
+## 🏗️ Build și Deploy
+
+### Build pentru producție
+
+```bash
+npm run build
+```
+
+### Deploy pe GitHub Pages
+
+1. Configurează secretele în GitHub (Settings → Secrets and variables → Actions):
+   - `FIREBASE_API_KEY`
+   - `FIREBASE_AUTH_DOMAIN`
+   - `FIREBASE_PROJECT_ID`
+   - `FIREBASE_STORAGE_BUCKET`
+   - `FIREBASE_MESSAGING_SENDER_ID`
+   - `FIREBASE_APP_ID`
+   - `FIREBASE_MEASUREMENT_ID`
+   - `APP_ID` (setează la `order-flow-28c1b`)
+   - `INITIAL_AUTH_TOKEN` (opțional)
+
+2. Activează GitHub Pages în repository settings (Source: GitHub Actions)
+
+3. Push pe branch-ul `main` va declanșa deploy-ul automat
+
+### Deploy pe Firebase Hosting (opțional)
+
+1. Instalează Firebase CLI: `npm install -g firebase-tools`
+2. Login: `firebase login`
+3. Configurează secretul `FIREBASE_SERVICE_ACCOUNT` în GitHub
+4. Deploy-ul se va face automat la push pe `main`
+
+## 📱 PWA Features
+
+- **Manifest** - Aplicația poate fi instalată pe dispozitive
+- **Service Worker** - Cache offline și sincronizare
+- **Icons** - Iconițe pentru toate dimensiunile
+- **Offline Support** - Funcționează fără internet
+
+## 🗂️ Structura Proiectului
 
 ```
 src/
-├── components/          # Componente React
-│   ├── InstallPrompt.jsx
-│   └── OfflineIndicator.jsx
-├── hooks/              # Custom hooks
-│   └── usePWAInstall.js
-├── App.jsx             # Componenta principală
-├── main.jsx            # Entry point
-└── index.css           # Stiluri globale
+├── config/
+│   └── firebase.js          # Configurația Firebase
+├── components/              # Componente React (de adăugat)
+├── App.jsx                  # Componenta principală
+├── main.jsx                 # Entry point
+└── index.css                # Stiluri Tailwind
 
 public/
-├── icons/              # Iconițe PWA
-├── manifest.webmanifest # Manifest PWA
-└── index.html          # Template HTML
+├── pwa-192x192.png         # Iconiță PWA 192x192
+├── pwa-512x512.png         # Iconiță PWA 512x512
+├── pwa-512x512-maskable.png # Iconiță maskable
+└── robots.txt              # Robots.txt
 
-.github/workflows/      # GitHub Actions
-└── deploy.yml          # Workflow deployment
+.github/workflows/
+├── pages.yml               # Workflow GitHub Pages
+└── firebase-hosting.yml    # Workflow Firebase Hosting
+
+firebase.json               # Configurația Firebase
+firestore.rules            # Regulile Firestore
 ```
 
-## 🧪 Testare
+## 🔧 Scripturi Disponibile
 
-Aplicația include teste comprehensive:
+- `npm run dev` - Rulează în modul development
+- `npm run build` - Build pentru producție
+- `npm run preview` - Preview build-ul local
+- `npm run lint` - Rulează ESLint
 
-- **Teste PWA:** Instalare, offline, service worker
-- **Teste UI:** Componente, responsive design
-- **Teste Firebase:** CRUD operations, sincronizare
-- **Teste Performance:** Load time, memory usage
+## 🐛 Debugging
 
-## 📱 Compatibilitate
+### Probleme comune
 
-### Browsere Suportate:
-- ✅ Chrome 80+
-- ✅ Edge 80+
-- ✅ Firefox 58+
-- ✅ Safari 11.1+
+1. **Firebase config missing** - Verifică că toate variabilele de mediu sunt setate
+2. **PWA nu se instalează** - Verifică că aplicația rulează pe HTTPS în producție
+3. **Service Worker nu se înregistrează** - Verifică console-ul browser-ului
 
-### Dispozitive:
-- ✅ Windows 10/11
-- ✅ macOS 10.14+
-- ✅ Android 5.0+
-- ✅ iOS 11.1+
+### Logs
 
-## 🤝 Contribuții
-
-1. Fork repository-ul
-2. Creează o branch pentru feature (`git checkout -b feature/AmazingFeature`)
-3. Commit modificările (`git commit -m 'Add some AmazingFeature'`)
-4. Push la branch (`git push origin feature/AmazingFeature`)
-5. Deschide un Pull Request
+- **Development**: Verifică console-ul browser-ului
+- **Production**: Verifică Network tab pentru request-uri Firebase
 
 ## 📄 Licență
 
-Acest proiect este licențiat sub MIT License - vezi fișierul [LICENSE](LICENSE) pentru detalii.
+MIT License
 
-## 🆘 Suport
+## 🤝 Contribuții
 
-Pentru probleme sau întrebări:
+Contribuțiile sunt binevenite! Te rog să deschizi un issue sau pull request.
 
-1. Verifică [Issues](https://github.com/TU_USERNAME/orderflow-pwa/issues)
-2. Creează un nou issue cu detalii despre problema
-3. Include informații despre browser și sistemul de operare
+## 📞 Suport
 
-## 🎯 Roadmap
-
-- [ ] Notificări push
-- [ ] Sincronizare în cloud
-- [ ] Multi-user support
-- [ ] Export PDF
-- [ ] Integrare plăți online
-- [ ] Mobile app (React Native)
-
----
-
-**Dezvoltat cu ❤️ pentru business-uri mici și mijlocii**
+Pentru probleme sau întrebări, deschide un issue pe GitHub.

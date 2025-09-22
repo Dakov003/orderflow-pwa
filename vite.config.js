@@ -2,92 +2,86 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// https://vite.dev/config/
 export default defineConfig({
-  base: '/orderflow-pwa/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+      includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'OrderFlow PWA',
+        short_name: 'OrderFlow',
+        description: 'OrderFlow PWA - Gestiune Comenzi',
+        start_url: '/',
+        display: 'standalone',
+        theme_color: '#2563eb',
+        background_color: '#ffffff',
+        icons: [
+          { 
+            src: 'pwa-192x192.png', 
+            sizes: '192x192', 
+            type: 'image/png' 
           },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'gstatic-fonts-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
-              },
-              cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
+          { 
+            src: 'pwa-512x512.png', 
+            sizes: '512x512', 
+            type: 'image/png' 
           },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
-              }
-            }
+          { 
+            src: 'pwa-512x512-maskable.png', 
+            sizes: '512x512', 
+            type: 'image/png', 
+            purpose: 'maskable' 
           }
         ]
       },
-      includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
-      manifest: {
-        name: 'OrderFlow - Gestiune Comenzi',
-        short_name: 'OrderFlow',
-        description: 'Aplicație PWA pentru gestiunea comenzilor și clienților',
-        start_url: '/orderflow-pwa/',
-        display: 'standalone',
-        orientation: 'portrait-primary',
-        background_color: '#ffffff',
-        theme_color: '#0ea5e9',
-        scope: '/orderflow-pwa/',
-        lang: 'ro',
-        categories: ['business', 'productivity'],
-        icons: [
+      workbox: {
+        runtimeCaching: [
+          // Cache pentru API Firebase (firestore.googleapis.com)
           {
-            src: 'icons/icon-192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
+            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: { 
+              cacheName: 'firestore-api', 
+              networkTimeoutSeconds: 5,
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
           },
+          // Cache pentru fonts și CDN-uri comune
+          { 
+            urlPattern: /^https:\/\/(fonts|cdn)\./i, 
+            handler: 'StaleWhileRevalidate', 
+            options: { cacheName: 'assets-cdn' } 
+          },
+          // Cache pentru imagini
           {
-            src: 'icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ],
-        screenshots: [
-          {
-            src: 'icons/icon-512.png',
-            sizes: '512x512',
-            type: 'image/png',
-            form_factor: 'narrow'
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+            },
           }
         ]
       }
     })
-  ]
+  ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth'],
+          ui: ['lucide-react']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  }
 })
